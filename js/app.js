@@ -25,39 +25,47 @@ const productos = [
     }
 ];
 
-let carrito = [];
+// Inicializar el carrito desde localStorage o como un arreglo vacío
+let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
 function mostrarCatalogo() {
     const contenedor = document.getElementById('contenedor-productos');
     if (!contenedor) return;
     
-    // Limpiamos el contenedor por si acaso
     contenedor.innerHTML = "";
-
     productos.forEach(p => {
         const item = document.createElement('div');
-        // Clase responsiva: 1 col en móvil, 2 en tablets, 4 en desktop [cite: 29, 32]
         item.className = 'col-12 col-md-6 col-lg-3'; 
-        
         item.innerHTML = `
             <div class="card h-100 border-0 shadow-sm">
-                <img src="${p.img}" class="card-img-top" alt="${p.nombre}" onerror="this.src='https://via.placeholder.com/400x300?text=Error+al+cargar'">
+                <img src="${p.img}" class="card-img-top" alt="${p.nombre}">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title h6">${p.nombre}</h5>
                     <p class="fw-bold text-dark">$${p.precio.toLocaleString()}</p>
                     <div class="mt-auto d-grid gap-2">
                         <a href="detalle.html" class="btn btn-sm btn-outline-dark">Detalles</a>
-                        <button onclick="sumarAlCarrito()" class="btn btn-sm btn-primary">Agregar</button>
+                        <button onclick="sumarAlCarrito(${p.id})" class="btn btn-sm btn-primary">Agregar</button>
                     </div>
                 </div>
             </div>
         `;
         contenedor.appendChild(item);
     });
+    // Actualizar el contador apenas carga la página
+    actualizarContadorVisual();
 }
 
-function sumarAlCarrito() {
-    carrito.push(1);
+function sumarAlCarrito(id) {
+    const producto = productos.find(p => p.id === id);
+    if (producto) {
+        carrito.push(producto);
+        // Guardar en localStorage (debe ser un string) 
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+        actualizarContadorVisual();
+    }
+}
+
+function actualizarContadorVisual() {
     const badge = document.getElementById('contador-carrito');
     if (badge) {
         badge.innerText = carrito.length;

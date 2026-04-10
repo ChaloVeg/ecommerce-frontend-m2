@@ -10,32 +10,23 @@
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="index.html">TurboStore</a>
+            <a class="navbar-brand fw-bold" href="index.html">TurboStore</a>
+            <div class="d-flex align-items-center">
+                <a class="nav-link text-light me-3 d-none d-md-block" href="index.html">Inicio</a>
+                <button class="btn btn-outline-light position-relative">
+                    Carrito
+                    <span id="contador-carrito" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <main class="container my-5">
-        <div class="row align-items-center">
-            <div class="col-md-6 mb-4">
-                <img src="https://via.placeholder.com/600x400?text=Imagen+Producto" class="img-fluid rounded shadow-sm" alt="Producto">
-            </div>
-            <div class="col-md-6">
-                <h1 class="display-5 fw-bold">Especificaciones Técnicas</h1>
-                <p class="text-primary h3 fw-bold mb-3">$45.000</p>
-                <p class="lead">Producto de alta calidad diseñado para optimizar el rendimiento de sus equipos industriales y de movilidad personal.</p>
-                <hr>
-                <button class="btn btn-primary btn-lg px-5">Agregar al Carrito</button>
-                <div class="mt-3">
-                    <a href="index.html" class="text-decoration-none text-secondary">← Volver al catálogo</a>
-                </div>
-            </div>
-        </div>
+    <main id="contenedor-detalle" class="container my-5">
+        <!-- El contenido se cargará dinámicamente desde app.js -->
     </main>
 
-    <footer class="bg-dark text-light py-4 mt-auto">
-        <div class="container text-center">
-            <p>&copy; 2026 TurboStore</p>
-        </div>
-    </footer>
+    <footer id="mi-footer" class="bg-dark text-light py-4 mt-auto"></footer>
+
+    <script src="js/app.js"></script>
 </body>
 </html>

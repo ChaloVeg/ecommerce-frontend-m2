@@ -38,8 +38,8 @@ function mostrarCatalogo() {
     
     contenedor.innerHTML = "";
     productos.forEach(p => {
-        const item = document.createElement('div');
-        item.className = 'col-12 col-md-6 col-lg-3'; 
+        const item = document.createElement('article');
+        item.className = 'col-12 col-md-6 col-lg-3 mb-4'; 
         item.innerHTML = `
             <div class="card h-100 border-0 shadow-sm">
                 <img src="${p.img}" class="card-img-top" alt="${p.nombre}">
@@ -55,17 +55,15 @@ function mostrarCatalogo() {
         `;
         contenedor.appendChild(item);
     });
-    // Actualizar el contador apenas carga la página
-    actualizarContadorVisual();
 }
 
 function sumarAlCarrito(id) {
     const producto = productos.find(p => p.id === id);
     if (producto) {
         carrito.push(producto);
-        // Guardar en localStorage (debe ser un string) 
         localStorage.setItem('carrito', JSON.stringify(carrito));
         actualizarContadorVisual();
+        // Opcional: abrir modal o avisar al usuario
     }
 }
 
@@ -79,10 +77,30 @@ function actualizarContadorVisual() {
 function renderizarFooter() {
     const footer = document.getElementById('mi-footer');
     if (footer) {
+        footer.className = "bg-dark text-white py-5 mt-5";
         footer.innerHTML = `
-            <div class="container text-center">
-                <p class="mb-0">&copy; 2026 TurboStore Chalo - Repuestos Industriales</p>
-                <small class="text-muted">Proyecto MVP para Bootcamp Academy</small>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 text-center text-md-start mb-4 mb-md-0">
+                        <h5 class="fw-bold mb-3">TurboStore Chalo</h5>
+                        <p class="small text-secondary mb-0">Especialistas en repuestos industriales y soluciones de movilidad eléctrica para flotas.</p>
+                    </div>
+
+                    <div class="col-md-4 text-center mb-4 mb-md-0">
+                        <h6 class="text-uppercase fw-bold mb-3">Contacto</h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> Av. Industrial 1234, Pudahuel, Santiago</li>
+                            <li class="mb-2"><i class="bi bi-telephone-fill me-2"></i> +56 9 1234 5678</li>
+                            <li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> contacto@turbostore.cl</li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-4 text-center text-md-end">
+                        <h6 class="text-uppercase fw-bold mb-3">Proyecto MVP</h6>
+                        <p class="small mb-0 text-muted">Bootcamp Academy - Módulo 2</p>
+                        <p class="small mb-0 text-muted">&copy; 2026 Todos los derechos reservados.</p>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -90,16 +108,15 @@ function renderizarFooter() {
 
 function mostrarDetalleProducto() {
     const contenedorDetalle = document.getElementById('contenedor-detalle');
-    if (!contenedorDetalle) return; // Si no estamos en detalle.html, salimos
+    if (!contenedorDetalle) return;
 
-    // Obtener el ID de la URL
     const params = new URLSearchParams(window.location.search);
     const id = parseInt(params.get('id'));
     const producto = productos.find(p => p.id === id);
 
     if (producto) {
         contenedorDetalle.innerHTML = `
-            <div class="row align-items-center">
+            <div class="row align-items-center py-5">
                 <div class="col-md-6 mb-4">
                     <img src="${producto.img}" class="img-fluid rounded shadow-sm" alt="${producto.nombre}">
                 </div>
@@ -120,8 +137,92 @@ function mostrarDetalleProducto() {
     }
 }
 
+function inicializarModalCarrito() {
+    const modalHTML = `
+        <div class="modal fade" id="carritoModal" tabindex="-1" aria-labelledby="carritoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title" id="carritoModalLabel">Tu Carrito</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modal-body-carrito"></div>
+                    <div class="modal-footer d-flex justify-content-between align-items-center border-top">
+                        <h5 class="mb-0 fw-bold">Total: <span id="total-carrito" class="text-primary">$0</span></h5>
+                        <div>
+                            <button type="button" class="btn btn-outline-danger btn-sm me-2" onclick="vaciarCarrito()">Vaciar</button>
+                            <button type="button" class="btn btn-success" id="btn-pagar" onclick="renderizarContenidoCarrito()">Ir a Pagar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function renderizarContenidoCarrito() {
+    const modalBody = document.getElementById('modal-body-carrito');
+    const totalCarrito = document.getElementById('total-carrito');
+    const btnPagar = document.getElementById('btn-pagar');
+    
+    if (!modalBody) return;
+
+    if (carrito.length === 0) {
+        modalBody.innerHTML = '<p class="text-center text-muted my-4">Tu carrito está vacío.</p>';
+        totalCarrito.innerText = '$0';
+        if (btnPagar) btnPagar.disabled = true;
+        return;
+    }
+
+    if (btnPagar) btnPagar.disabled = false;
+    let total = 0;
+    let html = '<ul class="list-group list-group-flush">';
+    
+    carrito.forEach((p, index) => {
+        total += p.precio;
+        html += `
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <div>
+                    <h6 class="my-0">${p.nombre}</h6>
+                    <small class="text-muted">$${p.precio.toLocaleString()}</small>
+                </div>
+                <button class="btn btn-sm btn-outline-danger border-0" onclick="eliminarDelCarrito(${index})">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </li>
+        `;
+    });
+    html += '</ul>';
+    
+    modalBody.innerHTML = html;
+    totalCarrito.innerText = `$${total.toLocaleString()}`;
+}
+
+function vaciarCarrito() {
+    carrito = [];
+    localStorage.removeItem('carrito');
+    actualizarContadorVisual();
+    renderizarContenidoCarrito();
+}
+
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    actualizarContadorVisual();
+    renderizarContenidoCarrito();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    inicializarModalCarrito();
     mostrarCatalogo();
     renderizarFooter();
     mostrarDetalleProducto();
+    actualizarContadorVisual();
+
+    // Listener para actualizar el contenido cuando se abre el modal
+    const modalEl = document.getElementById('carritoModal');
+    if (modalEl) {
+        modalEl.addEventListener('show.bs.modal', renderizarContenidoCarrito);
+    }
 });

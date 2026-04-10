@@ -14,7 +14,7 @@
             <a class="navbar-brand fw-bold" href="index.html">TurboStore</a>
             <div class="d-flex align-items-center">
                 <a class="nav-link text-light me-3 d-none d-md-block" href="index.html">Inicio</a>
-                <button class="btn btn-outline-light position-relative">
+                <button class="btn btn-outline-light position-relative" data-bs-toggle="modal" data-bs-target="#carritoModal" onclick="renderizarContenidoCarrito()">
                     Carrito
                     <span id="contador-carrito" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
                 </button>
@@ -28,8 +28,7 @@
             <p class="lead text-muted">Soluciones de mantenimiento y movilidad eléctrica.</p>
         </header>
 
-        <section id="contenedor-productos" class="row g-4">
-            </section>
+        <section id="contenedor-productos" class="row g-4"></section>
     </main>
 
     <footer id="mi-footer" class="bg-dark text-light py-4 mt-auto"></footer>

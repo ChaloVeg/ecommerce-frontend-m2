@@ -24,12 +24,12 @@ const productos = [
         id: 4, 
         nombre: "Llanta MG", 
         precio: 74000, 
-        img: "img/Llanta.jpg",
+        // CORRECCIÓN 1: El nombre del archivo debe ser exacto (minúsculas/mayúsculas)
+        img: "img/llanta.jpg", 
         descripcion: "Llanta de aleación original para vehículos MG. Diseño deportivo, altamente resistente y ligero para mejorar el rendimiento y la estética."
     }
 ];
 
-// Inicializar el carrito desde localStorage o como un arreglo vacío
 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
 function mostrarCatalogo() {
@@ -63,7 +63,8 @@ function sumarAlCarrito(id) {
         carrito.push(producto);
         localStorage.setItem('carrito', JSON.stringify(carrito));
         actualizarContadorVisual();
-        // Opcional: abrir modal o avisar al usuario
+        // CORRECCIÓN 2: Actualiza el modal inmediatamente si el usuario agrega desde el detalle
+        renderizarContenidoCarrito(); 
     }
 }
 
@@ -79,30 +80,23 @@ function renderizarFooter() {
     if (footer) {
         footer.className = "bg-dark text-white py-5 mt-5";
         footer.innerHTML = `
-            <div class="container">
+            <div class="container text-center">
                 <div class="row">
-                    <div class="col-md-4 text-center text-md-start mb-4 mb-md-0">
-                        <h5 class="fw-bold mb-3">TurboStore Chalo</h5>
-                        <p class="small text-secondary mb-0">Especialistas en repuestos industriales y soluciones de movilidad eléctrica para flotas.</p>
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <h5 class="fw-bold">TurboStore Chalo</h5>
+                        <p class="small text-secondary">Repuestos y movilidad eléctrica.</p>
                     </div>
-
-                    <div class="col-md-4 text-center mb-4 mb-md-0">
-                        <h6 class="text-uppercase fw-bold mb-3">Contacto</h6>
-                        <ul class="list-unstyled small">
-                            <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> Av. Industrial 1234, Pudahuel, Santiago</li>
-                            <li class="mb-2"><i class="bi bi-telephone-fill me-2"></i> +56 9 1234 5678</li>
-                            <li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> contacto@turbostore.cl</li>
-                        </ul>
+                    <div class="col-md-4 mb-4 mb-md-0">
+                        <h6 class="text-uppercase fw-bold">Contacto</h6>
+                        <p class="small mb-0">Av. Industrial 1234, Pudahuel</p>
+                        <p class="small">+56 9 1234 5678</p>
                     </div>
-
-                    <div class="col-md-4 text-center text-md-end">
-                        <h6 class="text-uppercase fw-bold mb-3">Proyecto MVP</h6>
-                        <p class="small mb-0 text-muted">Bootcamp Academy - Módulo 2</p>
-                        <p class="small mb-0 text-muted">&copy; 2026 Todos los derechos reservados.</p>
+                    <div class="col-md-4">
+                        <h6 class="text-uppercase fw-bold">Proyecto MVP</h6>
+                        <p class="small text-muted">Bootcamp Academy - Módulo 2</p>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 }
 
@@ -130,34 +124,33 @@ function mostrarDetalleProducto() {
                         <a href="index.html" class="text-decoration-none text-secondary">← Volver al catálogo</a>
                     </div>
                 </div>
-            </div>
-        `;
-    } else {
-        contenedorDetalle.innerHTML = '<div class="text-center py-5"><h2>Producto no encontrado</h2><a href="index.html" class="btn btn-primary mt-3">Volver al catálogo</a></div>';
+            </div>`;
     }
 }
 
 function inicializarModalCarrito() {
+    // CORRECCIÓN 3: Evitar duplicados si la función se llama varias veces
+    if (document.getElementById('carritoModal')) return; 
+
     const modalHTML = `
-        <div class="modal fade" id="carritoModal" tabindex="-1" aria-labelledby="carritoModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal fade" id="carritoModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header bg-dark text-white">
-                        <h5 class="modal-title" id="carritoModalLabel">Tu Carrito</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">Tu Carrito</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body" id="modal-body-carrito"></div>
-                    <div class="modal-footer d-flex justify-content-between align-items-center border-top">
+                    <div class="modal-footer d-flex justify-content-between border-top">
                         <h5 class="mb-0 fw-bold">Total: <span id="total-carrito" class="text-primary">$0</span></h5>
                         <div>
-                            <button type="button" class="btn btn-outline-danger btn-sm me-2" onclick="vaciarCarrito()">Vaciar</button>
-                            <button type="button" class="btn btn-success" id="btn-pagar" onclick="renderizarContenidoCarrito()">Ir a Pagar</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="vaciarCarrito()">Vaciar</button>
+                            <button type="button" class="btn btn-success" id="btn-pagar">Ir a Pagar</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `;
+        </div>`;
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -169,7 +162,7 @@ function renderizarContenidoCarrito() {
     if (!modalBody) return;
 
     if (carrito.length === 0) {
-        modalBody.innerHTML = '<p class="text-center text-muted my-4">Tu carrito está vacío.</p>';
+        modalBody.innerHTML = '<p class="text-center text-muted">Tu carrito está vacío.</p>';
         totalCarrito.innerText = '$0';
         if (btnPagar) btnPagar.disabled = true;
         return;
@@ -178,24 +171,15 @@ function renderizarContenidoCarrito() {
     if (btnPagar) btnPagar.disabled = false;
     let total = 0;
     let html = '<ul class="list-group list-group-flush">';
-    
     carrito.forEach((p, index) => {
         total += p.precio;
         html += `
             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                <div>
-                    <h6 class="my-0">${p.nombre}</h6>
-                    <small class="text-muted">$${p.precio.toLocaleString()}</small>
-                </div>
-                <button class="btn btn-sm btn-outline-danger border-0" onclick="eliminarDelCarrito(${index})">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </li>
-        `;
+                <div><h6 class="my-0 small">${p.nombre}</h6><small class="text-muted">$${p.precio.toLocaleString()}</small></div>
+                <button class="btn btn-sm text-danger" onclick="eliminarDelCarrito(${index})">&times;</button>
+            </li>`;
     });
-    html += '</ul>';
-    
-    modalBody.innerHTML = html;
+    modalBody.innerHTML = html + '</ul>';
     totalCarrito.innerText = `$${total.toLocaleString()}`;
 }
 
@@ -220,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mostrarDetalleProducto();
     actualizarContadorVisual();
 
-    // Listener para actualizar el contenido cuando se abre el modal
+    // Sincronización del modal
     const modalEl = document.getElementById('carritoModal');
     if (modalEl) {
         modalEl.addEventListener('show.bs.modal', renderizarContenidoCarrito);
